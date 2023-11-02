@@ -141,37 +141,34 @@ class NeRFModel(Model):
             raise ValueError("populate_fields() must be called before get_outputs")
 
         # uniform sampling
-        ray_samples_uniform = self.sampler_uniform(ray_bundle)
-        if self.temporal_distortion is not None:
-            offsets = self.temporal_distortion(ray_samples_uniform.frustums.get_positions(), ray_samples_uniform.times)
-            ray_samples_uniform.frustums.set_offsets(offsets)
+        # use self.sampler_uniform function to sample rays from the ray bundle
+        # (optional) check if temporal distortion is enabled
+        # if so, apply temporal distortion to the sampled rays
+        # set offsets to the sampled rays
+
 
         # coarse field:
-        field_outputs_coarse = self.field_coarse.forward(ray_samples_uniform)
-        weights_coarse = ray_samples_uniform.get_weights(field_outputs_coarse[FieldHeadNames.DENSITY])
-        rgb_coarse = self.renderer_rgb(
-            rgb=field_outputs_coarse[FieldHeadNames.RGB],
-            weights=weights_coarse,
-        )
-        accumulation_coarse = self.renderer_accumulation(weights_coarse)
-        depth_coarse = self.renderer_depth(weights_coarse, ray_samples_uniform)
+        # use self.field_coarse model
+        # get weight from the sampled rays
+        # use self.renderer_rgb function to render rgb image
+        # use self.renderer_accumulation function to render accumulation image
+        # use self.renderer_depth function to render depth image
+
 
         # pdf sampling
-        ray_samples_pdf = self.sampler_pdf(ray_bundle, ray_samples_uniform, weights_coarse)
-        if self.temporal_distortion is not None:
-            offsets = self.temporal_distortion(ray_samples_pdf.frustums.get_positions(), ray_samples_pdf.times)
-            ray_samples_pdf.frustums.set_offsets(offsets)
+        # use self.sampler_pdf function to sample rays from the ray bundle
+        # (optional) if temporal distortion is enabled, apply temporal distortion to the sampled rays
+        # set offsets to the sampled rays
+        
 
         # fine field:
-        field_outputs_fine = self.field_fine.forward(ray_samples_pdf)
-        weights_fine = ray_samples_pdf.get_weights(field_outputs_fine[FieldHeadNames.DENSITY])
-        rgb_fine = self.renderer_rgb(
-            rgb=field_outputs_fine[FieldHeadNames.RGB],
-            weights=weights_fine,
-        )
-        accumulation_fine = self.renderer_accumulation(weights_fine)
-        depth_fine = self.renderer_depth(weights_fine, ray_samples_pdf)
-
+        # use self.field_fine model
+        # get weight from the sampled rays
+        # use self.renderer_rgb function to render rgb image
+        # use self.renderer_accumulation function to render accumulation image
+        # use self.renderer_depth function to render depth image
+        
+        
         outputs = {
             "rgb_coarse": rgb_coarse,
             "rgb_fine": rgb_fine,
