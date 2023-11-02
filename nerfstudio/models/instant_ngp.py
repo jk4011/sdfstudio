@@ -221,9 +221,8 @@ class NGPModel(Model):
         return metrics_dict
 
     def get_loss_dict(self, outputs, batch, metrics_dict=None):
-        image = batch["image"].to(self.device)
-        mask = outputs["alive_ray_mask"]
-        rgb_loss = self.rgb_loss(image[mask], outputs["rgb"][mask])
+        # TODO: using self.rgb_loss get rgb_loss
+        
         loss_dict = {"rgb_loss": rgb_loss}
         return loss_dict
 
