@@ -114,7 +114,8 @@ class NeRFModel(Model):
         self.renderer_depth = DepthRenderer()
 
         # losses
-        self.rgb_loss = MSELoss()
+        # TODO: implement rgb loss
+        self.rgb_loss = 
 
         # metrics
         self.psnr = PeakSignalNoiseRatio(data_range=1.0)
@@ -184,14 +185,9 @@ class NeRFModel(Model):
 
     def get_loss_dict(self, outputs, batch, metrics_dict=None) -> Dict[str, torch.Tensor]:
         # Scaling metrics by coefficients to create the losses.
-        device = outputs["rgb_coarse"].device
-        image = batch["image"].to(device)
-
-        rgb_loss_coarse = self.rgb_loss(image, outputs["rgb_coarse"])
-        rgb_loss_fine = self.rgb_loss(image, outputs["rgb_fine"])
-
+        #TODO: calculate rgb loss for coarse and fine fields using self.rgb_loss
         loss_dict = {"rgb_loss_coarse": rgb_loss_coarse, "rgb_loss_fine": rgb_loss_fine}
-        loss_dict = misc.scale_dict(loss_dict, self.config.loss_coefficients)
+        #TODO: Scale the losses by the coefficients using misc.scale_dict
         return loss_dict
 
     def get_image_metrics_and_images(
