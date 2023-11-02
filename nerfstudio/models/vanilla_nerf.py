@@ -87,31 +87,21 @@ class NeRFModel(Model):
         super().populate_modules()
 
         # fields
-        position_encoding = NeRFEncoding(
-            in_dim=3, num_frequencies=10, min_freq_exp=0.0, max_freq_exp=8.0, include_input=True
-        )
-        direction_encoding = NeRFEncoding(
-            in_dim=3, num_frequencies=4, min_freq_exp=0.0, max_freq_exp=4.0, include_input=True
-        )
+        position_encoding = 
+        direction_encoding = 
 
-        self.field_coarse = NeRFField(
-            position_encoding=position_encoding,
-            direction_encoding=direction_encoding,
-        )
+        self.field_coarse = 
 
-        self.field_fine = NeRFField(
-            position_encoding=position_encoding,
-            direction_encoding=direction_encoding,
-        )
+        self.field_fine = 
 
         # samplers
-        self.sampler_uniform = UniformSampler(num_samples=self.config.num_coarse_samples)
-        self.sampler_pdf = PDFSampler(num_samples=self.config.num_importance_samples)
+        self.sampler_uniform = 
+        self.sampler_pdf = 
 
         # renderers
-        self.renderer_rgb = RGBRenderer(background_color=colors.WHITE)
-        self.renderer_accumulation = AccumulationRenderer()
-        self.renderer_depth = DepthRenderer()
+        self.renderer_rgb = 
+        self.renderer_accumulation = 
+        self.renderer_depth = 
 
         # losses
         self.rgb_loss = MSELoss()
