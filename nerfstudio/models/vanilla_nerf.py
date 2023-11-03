@@ -115,7 +115,7 @@ class NeRFModel(Model):
 
         # losses
         # TODO: implement rgb loss
-        self.rgb_loss = 
+        self.rgb_loss = MSELoss()
 
         # metrics
         self.psnr = PeakSignalNoiseRatio(data_range=1.0)
