@@ -185,9 +185,14 @@ class NeRFModel(Model):
 
     def get_loss_dict(self, outputs, batch, metrics_dict=None) -> Dict[str, torch.Tensor]:
         # Scaling metrics by coefficients to create the losses.
-        #TODO: calculate rgb loss for coarse and fine fields using self.rgb_loss
+        device = outputs["rgb_coarse"].device
+        image = batch["image"].to(device)
+        
+        rgb_loss_coarse = self.rgb_loss(image, outputs["rgb_coarse"])
+        rgb_loss_fine = self.rgb_loss(image, outputs["rgb_fine"])
+        
         loss_dict = {"rgb_loss_coarse": rgb_loss_coarse, "rgb_loss_fine": rgb_loss_fine}
-        #TODO: Scale the losses by the coefficients using misc.scale_dict
+        loss_dict = misc.scale_dict(loss_dict, self.config.loss_coefficients)
         return loss_dict
 
     def get_image_metrics_and_images(
