@@ -80,22 +80,22 @@ class TCNNInstantNGPField(Field):
 
         Parameter(aabb, requires_grad=False)
         # TODO:
-        self.geo_feat_dim = 
-        self.contraction_type = 
+        self.geo_feat_dim = geo_feat_dim
+        self.contraction_type = contraction_type
 
         # TODO:
-        self.use_appearance_embedding = 
+        self.use_appearance_embedding = use_appearance_embedding
         if use_appearance_embedding:
             assert num_images is not None
             self.appearance_embedding_dim = appearance_embedding_dim
         # TODO:
-            self.appearance_embedding = 
+            self.appearance_embedding = Embedding(num_images, appearance_embedding_dim)
 
         # TODO: set this properly based on the aabb
         per_level_scale = 1.4472692012786865
 
         # TODO:
-        tcnn.Encoding(
+        self.directional_encoding = tcnn.Encoding(
             n_input_dims=3,
             encoding_config={
                 "otype": "SphericalHarmonics",
@@ -104,12 +104,12 @@ class TCNNInstantNGPField(Field):
         )
 
         # TODO:
-        tcnn.NetworkWithInputEncoding(
+        self.mlp_base = tcnn.NetworkWithInputEncoding(
             n_input_dims=3,
             n_output_dims=1 + self.geo_feat_dim,
             encoding_config={
                 # TODO:
-                "otype": "",
+                "otype": "HashGrid",
                 "n_levels": 16,
                 "n_features_per_level": 2,
                 "log2_hashmap_size": 19,
@@ -126,13 +126,13 @@ class TCNNInstantNGPField(Field):
         )
 
         # TODO:
-        in_dim = 
+        in_dim = self.directional_encoding.n_output_dims + self.get_feat_dim
         if self.use_appearance_embedding:
             in_dim += self.appearance_embedding_dim
             
             
         # TODO:
-        tcnn.Network(
+        self.mlp_head = tcnn.Network(
             n_input_dims=in_dim,
             n_output_dims=3,
             network_config={
@@ -140,7 +140,7 @@ class TCNNInstantNGPField(Field):
                 "activation": "ReLU",
                 "output_activation": "Sigmoid",
                 # TODO:
-                "n_neurons": ,
+                "n_neurons": hidden_dim_color,
                 # TODO:
                 "n_hidden_layers": num_layers_color - 1,
             },
