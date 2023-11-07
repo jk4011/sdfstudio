@@ -95,7 +95,7 @@ class TCNNInstantNGPField(Field):
         per_level_scale = 1.4472692012786865
 
         # TODO:
-        self.directional_encoding = tcnn.Encoding(
+        self.direction_encoding = tcnn.Encoding(
             n_input_dims=3,
             encoding_config={
                 "otype": "SphericalHarmonics",
@@ -126,7 +126,7 @@ class TCNNInstantNGPField(Field):
         )
 
         # TODO:
-        in_dim = self.directional_encoding.n_output_dims + self.get_feat_dim
+        in_dim = self.direction_encoding.n_output_dims + self.geo_feat_dim
         if self.use_appearance_embedding:
             in_dim += self.appearance_embedding_dim
             
