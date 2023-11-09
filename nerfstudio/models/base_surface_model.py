@@ -145,95 +145,26 @@ class SurfaceModel(Model):
         """Set the fields and modules."""
         super().populate_modules()
 
-        if self.config.scene_contraction_norm == "inf":
-            order = float("inf")
-        elif self.config.scene_contraction_norm == "l2":
-            order = None
-        else:
-            raise ValueError("Invalid scene contraction norm")
+        # TODO: scene contraction
+        
+        # TODO: Fields
 
-        self.scene_contraction = SceneContraction(order=order)
-        # Can we also use contraction for sdf?
-        # Fields
-        self.field = self.config.sdf_field.setup(
-            aabb=self.scene_box.aabb,
-            spatial_distortion=self.scene_contraction,
-            num_images=self.num_train_data,
-            use_average_appearance_embedding=self.config.use_average_appearance_embedding,
-        )
+        # Collider : pass
 
-        # Collider
-        if self.scene_box.collider_type == "near_far":
-            self.collider = NearFarCollider(near_plane=self.scene_box.near, far_plane=self.scene_box.far)
-        elif self.scene_box.collider_type == "box":
-            self.collider = AABBBoxCollider(self.scene_box, near_plane=self.scene_box.near)
-        elif self.scene_box.collider_type == "sphere":
-            # TODO do we also use near if the ray don't intersect with the sphere
-            self.collider = SphereCollider(radius=self.scene_box.radius, soft_intersection=True)
-        else:
-            raise NotImplementedError
+        # background model : pass
 
-        # command line near and far has highest priority
-        if self.config.overwrite_near_far_plane:
-            self.collider = NearFarCollider(near_plane=self.config.near_plane, far_plane=self.config.far_plane)
-
-        # background model
-        if self.config.background_model == "grid":
-            self.field_background = TCNNNerfactoField(
-                self.scene_box.aabb,
-                spatial_distortion=self.scene_contraction,
-                num_images=self.num_train_data,
-                use_average_appearance_embedding=self.config.use_average_appearance_embedding,
-            )
-        elif self.config.background_model == "mlp":
-            position_encoding = NeRFEncoding(
-                in_dim=3, num_frequencies=10, min_freq_exp=0.0, max_freq_exp=9.0, include_input=True
-            )
-            direction_encoding = NeRFEncoding(
-                in_dim=3, num_frequencies=4, min_freq_exp=0.0, max_freq_exp=3.0, include_input=True
-            )
-
-            self.field_background = NeRFField(
-                position_encoding=position_encoding,
-                direction_encoding=direction_encoding,
-                spatial_distortion=self.scene_contraction,
-            )
-        else:
-            # dummy background model
-            self.field_background = Parameter(torch.ones(1), requires_grad=False)
-
-        self.sampler_bg = LinearDisparitySampler(num_samples=self.config.num_samples_outside)
-
-        # renderers
+        # TODO: renderers
         background_color = (
             get_color(self.config.background_color)
             if self.config.background_color in set(["white", "black"])
             else self.config.background_color
         )
-        self.renderer_rgb = RGBRenderer(background_color=background_color)
-        self.renderer_accumulation = AccumulationRenderer()
-        self.renderer_depth = DepthRenderer(method="expected")
-        self.renderer_normal = SemanticRenderer()
-        # patch warping
-        self.patch_warping = PatchWarping(
-            patch_size=self.config.patch_size, valid_angle_thres=self.config.patch_warp_angle_thres
-        )
-
-        # losses
-        self.rgb_loss = L1Loss()
-        self.s3im_loss = S3IM(s3im_kernel_size=self.config.s3im_kernel_size, s3im_stride=self.config.s3im_stride, s3im_repeat_time=self.config.s3im_repeat_time, s3im_patch_height=self.config.s3im_patch_height)
-
-        self.eikonal_loss = MSELoss()
-        self.depth_loss = ScaleAndShiftInvariantLoss(alpha=0.5, scales=1)
-        self.patch_loss = MultiViewLoss(
-            patch_size=self.config.patch_size, topk=self.config.topk, min_patch_variance=self.config.min_patch_variance
-        )
-        self.sensor_depth_loss = SensorDepthLoss(truncation=self.config.sensor_depth_truncation)
-
-        # metrics
-        self.psnr = PeakSignalNoiseRatio(data_range=1.0)
-        self.ssim = structural_similarity_index_measure
-        self.lpips = LearnedPerceptualImagePatchSimilarity()
+        
+        # patch warping : pass
+        
+        # TODO: losses
+        
+        # TODO: metrics
 
     def get_param_groups(self) -> Dict[str, List[Parameter]]:
         param_groups = {}
